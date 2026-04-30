@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Executive Mansion — Integrated HR & Access Control System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0f1e3d;
+    --navy-mid: #1a2f5a;
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --accent: #2563eb;
+    --danger: #dc2626;
+    --success: #16a34a;
+    --warn: #d97706;
+    --surface: #ffffff;
+    --surface2: #f4f6fb;
+    --surface3: #eaeff8;
+    --border: rgba(0,0,0,0.08);
+    --text: #0f1e3d;
+    --text2: #4b5563;
+    --text3: #9ca3af;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --navy: #e2e8f0; --navy-mid: #cbd5e1;
+      --surface: #1e293b; --surface2: #0f172a; --surface3: #162032;
+      --border: rgba(255,255,255,0.08);
+      --text: #e2e8f0; --text2: #94a3b8; --text3: #475569;
+    }
+  }
+
+  html, body { height: 100%; font-family: var(--font); background: var(--surface2); color: var(--text); font-size: 14px; }
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* Sidebar */
+  .sidebar { width: 230px; min-width: 230px; background: #0f1e3d; color: #fff; display: flex; flex-direction: column; }
+  @media (prefers-color-scheme: dark) { .sidebar { background: #0a0f1e; } }
+  .sidebar-brand { padding: 18px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 12px; }
+  .brand-logo { width: 46px; height: 46px; flex-shrink: 0; background: #fff; border-radius: 50%; padding: 3px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #c9a84c; }
+  .brand-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+  .brand-text { min-width: 0; }
+  .brand-line1 { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #c9a84c; font-weight: 600; margin-bottom: 2px; }
+  .brand-line2 { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.15; }
+  .brand-sub { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .sidebar-nav { padding: 10px 0; flex: 1; overflow-y: auto; }
+  .nav-section { padding: 10px 18px 4px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); font-weight: 500; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 18px; font-size: 13px; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; user-select: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .nav-item.active { background: rgba(201,168,76,0.12); color: #f0d080; border-left-color: #c9a84c; }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: rgba(255,255,255,0.4); }
+  .sidebar-footer span { color: #c9a84c; }
+  .logout-btn { display: flex; align-items: center; gap: 10px; padding: 10px 18px; font-size: 13px; color: #fca5a5; cursor: pointer; border-top: 1px solid rgba(255,255,255,0.06); transition: all 0.15s; }
+  .logout-btn:hover { background: rgba(220,38,38,0.15); color: #fff; }
+
+  /* Main */
+  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-size: 16px; font-weight: 600; }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .topbar-badge { background: #fef3c7; color: #92400e; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .user-chip { display: flex; align-items: center; gap: 8px; }
+  .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #c9a84c; color: #0f1e3d; font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+  .user-name { font-size: 13px; color: var(--text2); }
+  .content { padding: 20px 24px; flex: 1; }
+
+  /* Cards */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+  .card-title { font-size: 13px; font-weight: 600; }
+  .card-action { font-size: 12px; color: var(--accent); cursor: pointer; background: none; border: none; font-family: var(--font); }
+
+  /* Metrics */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; position: relative; overflow: hidden; }
+  .metric-icon { font-size: 22px; margin-bottom: 10px; }
+  .metric-val { font-size: 26px; font-weight: 700; font-family: var(--mono); }
+  .metric-label { font-size: 11px; color: var(--text2); margin-top: 2px; font-weight: 500; letter-spacing: 0.02em; }
+  .metric-delta { font-size: 11px; margin-top: 6px; color: var(--success); }
+  .metric-delta.warn { color: var(--warn); }
+  .metric-delta.danger { color: var(--danger); }
+  .metric-accent { position: absolute; right: 0; top: 0; bottom: 0; width: 4px; border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { text-align: left; padding: 9px 12px; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  tbody td { padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface2); }
+
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-gray { background: var(--surface3); color: var(--text2); }
+  @media (prefers-color-scheme: dark) {
+    .badge-green { background: #14532d; color: #86efac; }
+    .badge-red { background: #7f1d1d; color: #fca5a5; }
+    .badge-yellow { background: #422006; color: #fcd34d; }
+    .badge-blue { background: #1e3a8a; color: #93c5fd; }
+  }
+
+  .role-tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: var(--surface3); color: var(--text2); }
+  .emp-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .emp-info { display: flex; align-items: center; gap: 10px; }
+  .emp-name { font-weight: 500; font-size: 13px; }
+  .emp-id { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+  .access-bar { display: flex; gap: 3px; }
+  .access-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* Toolbar */
+  .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .search-wrap { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 7px 12px; flex: 1; max-width: 280px; }
+  .search-wrap input { background: none; border: none; outline: none; font-size: 13px; color: var(--text); font-family: var(--font); width: 100%; }
+  .search-wrap input::placeholder { color: var(--text3); }
+  .filter-btn { padding: 7px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); font-size: 12px; color: var(--text2); cursor: pointer; font-family: var(--font); transition: all 0.12s; }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: #dbeafe; border-color: var(--accent); color: var(--accent); }
+  @media (prefers-color-scheme: dark) { .filter-btn.active { background: #1e3a8a; } }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+  .section-gap { margin-bottom: 20px; }
+
+  /* Floor map */
+  .floor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .floor-room { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 12px; position: relative; cursor: pointer; transition: all 0.15s; }
+  .floor-room:hover { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+  .floor-room.locked { border-color: var(--danger); background: rgba(220,38,38,0.03); }
+  .floor-room.open { border-color: var(--success); background: rgba(22,163,74,0.03); }
+  .room-name { font-weight: 600; font-size: 12px; }
+  .room-count { font-size: 11px; color: var(--text2); margin-top: 3px; }
+  .room-access { font-size: 10px; margin-top: 6px; }
+  .lock-icon { position: absolute; top: 10px; right: 10px; font-size: 14px; }
+
+  /* Feed */
+  .feed-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .feed-text { font-size: 13px; line-height: 1.4; }
+  .feed-time { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+
+  /* Attendance chart */
+  .att-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-top: 10px; }
+  .att-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
+  .att-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.4s; }
+  .att-label { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+
+  /* Progress */
+  .progress-bar { height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+
+  /* Alerts */
+  .alert { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: var(--radius); font-size: 13px; margin-bottom: 10px; }
+  .alert-warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+  .alert-danger { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+  .alert-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+  @media (prefers-color-scheme: dark) {
+    .alert-warn { background: #422006; border-color: #92400e; color: #fcd34d; }
+    .alert-danger { background: #450a0a; border-color: #991b1b; color: #fca5a5; }
+    .alert-info { background: #1e3a8a; border-color: #2563eb; color: #93c5fd; }
+  }
+
+  /* Buttons */
+  .btn { padding: 9px 20px; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: var(--font); transition: all 0.12s; }
+  .btn-primary { background: #1a2f5a; color: #fff; }
+  .btn-gold { background: #c9a84c; color: #0f1e3d; }
+  .btn-gold:hover { background: #b8963f; }
+  .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  /* Forms */
+  .form-row { margin-bottom: 14px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 5px; display: block; }
+  .form-input, .form-select { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: var(--font); background: var(--surface2); color: var(--text); outline: none; transition: border 0.12s; }
+  .form-input:focus, .form-select:focus { border-color: var(--accent); }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--surface); border-radius: var(--radius-lg); padding: 24px; width: 460px; max-width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .modal-title { font-size: 16px; font-weight: 700; }
+  .modal-close { font-size: 20px; cursor: pointer; color: var(--text3); background: none; border: none; font-family: inherit; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+  /* Access card */
+  .access-card { background: linear-gradient(135deg, #0f1e3d 0%, #1a3a6e 100%); border-radius: 14px; padding: 18px 20px; color: #fff; position: relative; overflow: hidden; border: 1px solid rgba(201,168,76,0.3); }
+  .card-chip { width: 32px; height: 24px; background: #c9a84c; border-radius: 4px; margin-bottom: 14px; }
+  .card-name { font-size: 15px; font-weight: 700; }
+  .card-dept { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .card-num { font-family: var(--mono); font-size: 12px; color: #f0d080; margin-top: 12px; letter-spacing: 0.15em; }
+  .card-floors { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 6px; }
+
+  /* Live dot */
+  .live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.85)} }
+
+  /* Scan toast */
+  .scan-toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--success); border-radius: var(--radius); padding: 12px 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 200; min-width: 280px; transform: translateX(120%); transition: transform 0.3s ease; }
+  .scan-toast.show { transform: translateX(0); }
+  .scan-toast.denied { border-left-color: var(--danger); }
+  .scan-toast-icon { font-size: 22px; }
+  .scan-toast-text { font-size: 13px; }
+  .scan-toast-sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+
+  /* Pages */
+  .pages > div { display: none; }
+  .pages > div.active { display: block; }
+
+  /* Login */
+  .login-screen { position: fixed; inset: 0; background: linear-gradient(135deg,#0f1e3d 0%,#1a3a6e 100%); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 20px; }
+  .login-card { background: var(--surface); border-radius: 20px; padding: 36px 32px; width: 380px; max-width: 100%; box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
+  .login-logo { width: 80px; height: 80px; margin: 0 auto 16px; background: #fff; border-radius: 50%; padding: 4px; box-shadow: 0 0 0 3px #c9a84c; }
+  .login-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+  .login-title { text-align: center; font-size: 13px; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; }
+  .login-sub { text-align: center; font-size: 18px; font-weight: 700; margin: 4px 0 24px; color: var(--text); }
+
+  @media (max-width: 768px) {
+    .metrics, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+    .floor-grid { grid-template-columns: repeat(2, 1fr); }
+    .sidebar { width: 60px; min-width: 60px; }
+    .sidebar .nav-item span:last-child, .brand-text, .sidebar-footer, .nav-section, .logout-btn span:last-child { display: none; }
+    .nav-item, .logout-btn { justify-content: center; padding: 12px; }
+    .sidebar-brand { justify-content: center; padding: 14px 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo"><img src="/ministry-logo.png" alt="Ministry of State"></div>
+    <div class="login-title">Ministry of State</div>
+    <div class="login-sub">Executive Mansion · HR & Access</div>
+    <div class="form-row"><label class="form-label">Username</label><input class="form-input" id="login-user" value="sysadmin"></div>
+    <div class="form-row"><label class="form-label">Password</label><input class="form-input" id="login-pass" type="password" value="••••••••"></div>
+    <button class="btn btn-gold" style="width:100%;margin-top:6px" onclick="doLogin()">Sign In Securely</button>
+    <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:14px">Authorized personnel only · Government of Liberia</div>
+  </div>
+</div>
+
+<div class="app" id="app" style="display:none">
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo"><img src="/ministry-logo.png" alt="Ministry of State"></div>
+      <div class="brand-text">
+        <div class="brand-line1">Ministry of State</div>
+        <div class="brand-line2">Executive Mansion</div>
+        <div class="brand-sub">HR & Access Control</div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Core</div>
+      <div class="nav-item active" onclick="navigate('dashboard', this)"><span class="nav-icon">⊞</span> <span>Dashboard</span></div>
+      <div class="nav-item" onclick="navigate('employees', this)"><span class="nav-icon">👥</span> <span>Employees</span></div>
+      <div class="nav-item" onclick="navigate('attendance', this)"><span class="nav-icon">⏱</span> <span>Attendance</span></div>
+      <div class="nav-section">Security</div>
+      <div class="nav-item" onclick="navigate('access', this)"><span class="nav-icon">🔑</span> <span>Access Control</span></div>
+      <div class="nav-item" onclick="navigate('visitors', this)"><span class="nav-icon">🪪</span> <span>Guests / Visitors</span></div>
+      <div class="nav-item" onclick="navigate('scans', this)"><span class="nav-icon">📡</span> <span>Live ID Scans</span></div>
+      <div class="nav-section">Admin</div>
+      <div class="nav-item" onclick="navigate('users', this)"><span class="nav-icon">🛡</span> <span>Users</span></div>
+      <div class="nav-item" onclick="navigate('audit', this)"><span class="nav-icon">📜</span> <span>Audit Log</span></div>
+      <div class="nav-item" onclick="navigate('reports', this)"><span class="nav-icon">📊</span> <span>Reports</span></div>
+      <div class="nav-item" onclick="navigate('settings', this)"><span class="nav-icon">⚙</span> <span>Settings</span></div>
+    </div>
+    <div class="logout-btn" onclick="doLogout()"><span class="nav-icon">⏏</span> <span>Logout</span></div>
+    <div class="sidebar-footer">CIS Platform v1.1<br><span>Monrovia, Liberia</span></div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">System Dashboard</div>
+      <div class="topbar-right">
+        <span class="live-dot"></span>
+        <span style="font-size:12px;color:var(--text2)">Live</span>
+        <div class="topbar-badge" id="today-date"></div>
+        <div class="user-chip">
+          <div class="user-avatar">SA</div>
+          <div class="user-name">Sys. Admin</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="pages">
+
+        <!-- DASHBOARD -->
+        <div id="p-dashboard" class="active">
+          <div class="metrics">
+            <div class="metric-card"><div class="metric-accent" style="background:#2563eb"></div><div class="metric-icon">👥</div><div class="metric-val" id="m-total">148</div><div class="metric-label">Total Employees</div><div class="metric-delta">+3 this month</div></div>
+            <div class="metric-card"><div class="metric-accent" style="background:#16a34a"></div><div class="metric-icon">✅</div><div class="metric-val" id="m-present">121</div><div class="metric-label">Present Today</div><div class="metric-delta" id="m-pct">81.8% attendance</div></div>
+            <div class="metric-card"><div class="metric-accent" style="background:#dc2626"></div><div class="metric-icon">❌</div><div class="metric-val" id="m-absent">18</div><div class="metric-label">Absent Today</div><div class="metric-delta danger" id="m-absent-pct">12.2% of staff</div></div>
+            <div class="metric-card"><div class="metric-accent" style="background:#d97706"></div><div class="metric-icon">🔑</div><div class="metric-val" id="m-scans">94</div><div class="metric-label">ID Scans (Live)</div><div class="metric-delta warn">Last 2 hours</div></div>
+          </div>
+
+          <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
+            <div class="metric-card"><div class="metric-accent" style="background:#6366f1"></div><div class="metric-icon">🪪</div><div class="metric-val" id="m-vis-today">14</div><div class="metric-label">Visitors Today</div><div class="metric-delta">Across all entrances</div></div>
+            <div class="metric-card"><div class="metric-accent" style="background:#16a34a"></div><div class="metric-icon">🟢</div><div class="metric-val" id="m-vis-active">5</div><div class="metric-label">Active Visitors Now</div><div class="metric-delta">Currently on premises</div></div>
+            <div class="metric-card"><div class="metric-accent" style="background:#dc2626"></div><div class="metric-icon">⚠️</div><div class="metric-val">3</div><div class="metric-label">Security Alerts</div><div class="metric-delta warn">Requires review</div></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Weekly Attendance</div><button class="card-action" onclick="navigate('attendance',null)">View all →</button></div>
+              <div class="att-chart">
+                <div class="att-bar-wrap"><div class="att-bar" style="height:75%;background:#2563eb"></div><div class="att-label">Mon</div></div>
+                <div class="att-bar-wrap"><div class="att-bar" style="height:88%;background:#2563eb"></div><div class="att-label">Tue</div></div>
+                <div class="att-bar-wrap"><div class="att-bar" style="height:82%;background:#16a34a"></div><div class="att-label">Wed</div></div>
+                <div class="att-bar-wrap"><div class="att-bar" style="height:90%;background:#2563eb;opacity:0.4"></div><div class="att-label">Thu</div></div>
+                <div class="att-bar-wrap"><div class="att-bar" style="height:70%;background:#2563eb;opacity:0.3"></div><div class="att-label">Fri</div></div>
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin-top:10px">▰ Present &nbsp;▱ Projected</div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><div class="card-title">Employee Attendance Stats</div></div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>On Time</span><span style="font-family:var(--mono);font-weight:600">112 (75.7%)</span></div><div class="progress-bar"><div class="progress-fill" style="width:75.7%;background:#16a34a"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Late Arrivals</span><span style="font-family:var(--mono);font-weight:600">9 (6.1%)</span></div><div class="progress-bar"><div class="progress-fill" style="width:6.1%;background:#d97706"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>On Leave</span><span style="font-family:var(--mono);font-weight:600">9 (6.1%)</span></div><div class="progress-bar"><div class="progress-fill" style="width:6.1%;background:#2563eb"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Absent</span><span style="font-family:var(--mono);font-weight:600">18 (12.1%)</span></div><div class="progress-bar"><div class="progress-fill" style="width:12.1%;background:#dc2626"></div></div></div>
+                <div style="display:flex;gap:10px;margin-top:6px;padding-top:10px;border-top:1px solid var(--border)">
+                  <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-weight:700;font-size:18px;color:var(--success)">94.2%</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Month Avg</div></div>
+                  <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-weight:700;font-size:18px">7.8h</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Avg Hrs/Day</div></div>
+                  <div style="flex:1;text-align:center"><div style="font-family:var(--mono);font-weight:700;font-size:18px;color:var(--warn)">12 min</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Avg Late</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Recent ID Scans</div><button class="card-action" onclick="navigate('scans',null)">View live →</button></div>
+              <div id="dash-scan-feed"></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Security Alerts</div></div>
+              <div class="alert alert-danger"><span>🚨</span><div><strong>Unauthorized access attempt</strong> — Floor 4 (09:12 AM). Badge #UNK-441 not in system.</div></div>
+              <div class="alert alert-warn"><span>⚠️</span><div><strong>Card not returned</strong> — Visitor James Kollie (issued 08:30). Expected return by 12:00.</div></div>
+              <div class="alert alert-info"><span>ℹ️</span><div><strong>3 employees</strong> have not checked in as of 10:00 AM. Grace period ends at 10:30.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EMPLOYEES -->
+        <div id="p-employees">
+          <div class="toolbar">
+            <div class="search-wrap"><span>🔍</span><input type="text" id="emp-search" placeholder="Search employees..." oninput="filterEmployees()"></div>
+            <button class="filter-btn active" onclick="empFilter('all',this)">All</button>
+            <button class="filter-btn" onclick="empFilter('active',this)">Active</button>
+            <button class="filter-btn" onclick="empFilter('leave',this)">On Leave</button>
+            <button class="btn btn-gold btn-sm" onclick="showAddEmp()" style="margin-left:auto">+ Add Employee</button>
+          </div>
+          <div class="card"><div class="table-wrap"><table id="emp-table"><thead><tr><th>Employee</th><th>Department</th><th>Role</th><th>Card ID</th><th>Access Level</th><th>Status</th><th>Action</th></tr></thead><tbody id="emp-tbody"></tbody></table></div></div>
+        </div>
+
+        <!-- ATTENDANCE -->
+        <div id="p-attendance">
+          <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+            <div class="metric-card"><div class="metric-icon">✅</div><div class="metric-val">121</div><div class="metric-label">Checked In</div></div>
+            <div class="metric-card"><div class="metric-icon">⏰</div><div class="metric-val">9</div><div class="metric-label">Late</div></div>
+            <div class="metric-card"><div class="metric-icon">❌</div><div class="metric-val">18</div><div class="metric-label">Absent</div></div>
+            <div class="metric-card"><div class="metric-icon">🔄</div><div class="metric-val">9</div><div class="metric-label">On Leave</div></div>
+          </div>
+          <div class="card section-gap">
+            <div class="card-header"><div class="card-title" id="att-date-title">Today's Check-in Log</div><button class="btn btn-ghost btn-sm">Export CSV</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Employee</th><th>Check-In</th><th>Check-Out</th><th>Duration</th><th>Gate</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><div class="emp-info"><div class="emp-avatar" style="background:#dbeafe;color:#1e40af">JB</div><div><div class="emp-name">Johnson Brownell</div><div class="emp-id">EMP-0041</div></div></div></td><td>07:52 AM</td><td>—</td><td>2h 31m</td><td>Main Gate</td><td><span class="badge badge-green">● Present</span></td></tr>
+              <tr><td><div class="emp-info"><div class="emp-avatar" style="background:#dcfce7;color:#166534">OK</div><div><div class="emp-name">Oretha Kollie</div><div class="emp-id">EMP-0028</div></div></div></td><td>08:05 AM</td><td>—</td><td>2h 18m</td><td>Side Entrance</td><td><span class="badge badge-green">● Present</span></td></tr>
+              <tr><td><div class="emp-info"><div class="emp-avatar" style="background:#fef3c7;color:#92400e">AM</div><div><div class="emp-name">Abraham Morris</div><div class="emp-id">EMP-0007</div></div></div></td><td>08:32 AM</td><td>—</td><td>1h 51m</td><td>Main Gate</td><td><span class="badge badge-yellow">Late Arrival</span></td></tr>
+              <tr><td><div class="emp-info"><div class="emp-avatar" style="background:#fee2e2;color:#991b1b">FT</div><div><div class="emp-name">Florence Togba</div><div class="emp-id">EMP-0063</div></div></div></td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-red">Absent</span></td></tr>
+              <tr><td><div class="emp-info"><div class="emp-avatar" style="background:#f3e8ff;color:#6b21a8">GT</div><div><div class="emp-name">George Tarpeh</div><div class="emp-id">EMP-0015</div></div></div></td><td>08:01 AM</td><td>—</td><td>2h 22m</td><td>VIP Gate</td><td><span class="badge badge-green">● Present</span></td></tr>
+              <tr><td><div class="emp-info"><div class="emp-avatar" style="background:#dcfce7;color:#166534">MM</div><div><div class="emp-name">Martha Musa</div><div class="emp-id">EMP-0091</div></div></div></td><td>07:45 AM</td><td>—</td><td>2h 38m</td><td>Main Gate</td><td><span class="badge badge-green">● Present</span></td></tr>
+              <tr><td><div class="emp-info"><div class="emp-avatar" style="background:#dbeafe;color:#1e40af">RW</div><div><div class="emp-name">Roland Weah</div><div class="emp-id">EMP-0049</div></div></div></td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-blue">On Leave</span></td></tr>
+            </tbody></table></div>
+          </div>
+        </div>
+
+        <!-- ACCESS CONTROL -->
+        <div id="p-access">
+          <div class="grid-2 section-gap">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Floor Access Map — Executive Mansion</div></div>
+              <div class="floor-grid">
+                <div class="floor-room open" onclick="showFloorDetail('Main Lobby','All staff + Visitors','24','open')"><div class="lock-icon">🔓</div><div class="room-name">Main Lobby</div><div class="room-count">24 inside</div><div class="room-access"><span class="badge badge-green">Open Access</span></div></div>
+                <div class="floor-room open" onclick="showFloorDetail('Floor 2 — Admin','Level 2+ staff','11','open')"><div class="lock-icon">🔓</div><div class="room-name">Floor 2 — Admin</div><div class="room-count">11 inside</div><div class="room-access"><span class="badge badge-blue">Level 2+</span></div></div>
+                <div class="floor-room locked" onclick="showFloorDetail('Floor 3 — Cabinet','Cabinet & Senior staff','8','locked')"><div class="lock-icon">🔒</div><div class="room-name">Floor 3 — Cabinet</div><div class="room-count">8 inside</div><div class="room-access"><span class="badge badge-yellow">Level 3+</span></div></div>
+                <div class="floor-room locked" onclick="showFloorDetail('Floor 4 — Pres. Suite','Presidential staff only','2','locked')"><div class="lock-icon">🔒</div><div class="room-name">Floor 4 — Pres. Suite</div><div class="room-count">2 inside</div><div class="room-access"><span class="badge badge-red">Level 5 Only</span></div></div>
+                <div class="floor-room open" onclick="showFloorDetail('Conference A','All staff','6','open')"><div class="lock-icon">🔓</div><div class="room-name">Conference A</div><div class="room-count">6 inside</div><div class="room-access"><span class="badge badge-green">Open</span></div></div>
+                <div class="floor-room locked" onclick="showFloorDetail('Server Room','IT Admin only','1','locked')"><div class="lock-icon">🔒</div><div class="room-name">Server Room</div><div class="room-count">1 inside</div><div class="room-access"><span class="badge badge-red">IT Admin</span></div></div>
+              </div>
+            </div>
+            <div>
+              <div class="card" style="margin-bottom:14px">
+                <div class="card-header"><div class="card-title">Access Level Key</div></div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span>Level 1 — General Staff</span><span class="badge badge-green">Lobby + Floor 2</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span>Level 2 — Senior Staff</span><span class="badge badge-blue">+ Floor 3</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span>Level 3 — Directors</span><span class="badge badge-yellow">+ Conference B</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span>Level 4 — Cabinet</span><span class="badge badge-red">All Except Floor 4</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span>Level 5 — Presidential</span><span class="badge badge-red">Full Access</span></div>
+                </div>
+              </div>
+              <div class="access-card">
+                <div class="card-chip"></div>
+                <div class="card-name">Johnson Brownell</div>
+                <div class="card-dept">Cabinet Secretariat — Director</div>
+                <div class="card-num">EMP-0041 &bull; L4</div>
+                <div class="card-floors">Floors: Lobby · 2 · 3 · Conf A/B &nbsp;|&nbsp; Ministry of State, Liberia</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Access Log — Today</div><button class="btn btn-ghost btn-sm">Export</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Time</th><th>Employee / Visitor</th><th>Location</th><th>Action</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:var(--mono);font-size:12px">09:12 AM</td><td>Unknown (Badge #UNK-441)</td><td>Floor 4 — Pres. Suite</td><td>Scan</td><td><span class="badge badge-red">Denied</span></td></tr>
+              <tr><td style="font-family:var(--mono);font-size:12px">09:08 AM</td><td>George Tarpeh (EMP-0015)</td><td>Floor 3 — Cabinet</td><td>Entry</td><td><span class="badge badge-green">Granted</span></td></tr>
+              <tr><td style="font-family:var(--mono);font-size:12px">09:02 AM</td><td>Visitor — James Kollie</td><td>Conference A</td><td>Entry</td><td><span class="badge badge-yellow">Visitor Pass</span></td></tr>
+              <tr><td style="font-family:var(--mono);font-size:12px">08:55 AM</td><td>Oretha Kollie (EMP-0028)</td><td>Floor 2 — Admin</td><td>Entry</td><td><span class="badge badge-green">Granted</span></td></tr>
+              <tr><td style="font-family:var(--mono);font-size:12px">08:47 AM</td><td>Johnson Brownell (EMP-0041)</td><td>Floor 3 — Cabinet</td><td>Entry</td><td><span class="badge badge-green">Granted</span></td></tr>
+              <tr><td style="font-family:var(--mono);font-size:12px">08:32 AM</td><td>Abraham Morris (EMP-0007)</td><td>Main Lobby</td><td>Check-in</td><td><span class="badge badge-green">Granted</span></td></tr>
+            </tbody></table></div>
+          </div>
+        </div>
+
+        <!-- VISITORS -->
+        <div id="p-visitors">
+          <div class="grid-3 section-gap">
+            <div class="metric-card"><div class="metric-icon">🪪</div><div class="metric-val" id="v-today">14</div><div class="metric-label">Visitors Today</div></div>
+            <div class="metric-card"><div class="metric-icon">🟢</div><div class="metric-val" id="v-active">5</div><div class="metric-label">Currently On-Site</div></div>
+            <div class="metric-card"><div class="metric-icon">⏱</div><div class="metric-val">42min</div><div class="metric-label">Avg Visit Duration</div></div>
+          </div>
+          <div class="grid-2 section-gap">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Register Visitor</div></div>
+              <div class="form-row"><label class="form-label">Full Name</label><input class="form-input" id="vis-name" placeholder="Visitor full name"></div>
+              <div class="form-row"><label class="form-label">Purpose of Visit</label><input class="form-input" id="vis-purpose" placeholder="e.g. Cabinet meeting, Briefing..."></div>
+              <div class="form-row"><label class="form-label">Host (Employee)</label>
+                <select class="form-select"><option>Johnson Brownell — Cabinet Secretariat</option><option>Oretha Kollie — Admin Office</option><option>George Tarpeh — State Protocol</option><option>Martha Musa — Finance</option></select>
+              </div>
+              <div class="form-row"><label class="form-label">Access Area</label>
+                <select class="form-select" id="vis-area"><option>Main Lobby Only</option><option>Floor 2 — Admin</option><option>Conference A</option><option>Conference B (Floor 3)</option></select>
+              </div>
+              <div class="form-row"><label class="form-label">Valid Until</label><input class="form-input" id="vis-until" type="time" value="17:00"></div>
+              <button class="btn btn-gold" onclick="issueVisitorPass()" style="width:100%;margin-top:6px">Issue Visitor Pass</button>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Active Visitor Passes Today</div></div>
+              <div id="visitor-list">
+                <div class="feed-item"><div class="feed-dot" style="background:#d97706"></div><div style="flex:1"><div style="display:flex;justify-content:space-between"><div class="feed-text"><strong>James Kollie</strong> — Cabinet Meeting</div><span class="badge badge-yellow">Active</span></div><div class="feed-time">Pass #V-001 · Conf A · Valid until 13:00</div></div></div>
+                <div class="feed-item"><div class="feed-dot" style="background:#16a34a"></div><div style="flex:1"><div style="display:flex;justify-content:space-between"><div class="feed-text"><strong>Dr. Sarah Freeman</strong> — Health Briefing</div><span class="badge badge-green">Active</span></div><div class="feed-time">Pass #V-002 · Floor 2 · Valid until 16:00</div></div></div>
+                <div class="feed-item"><div class="feed-dot" style="background:#16a34a"></div><div style="flex:1"><div style="display:flex;justify-content:space-between"><div class="feed-text"><strong>Hon. Marcus Doe</strong> — Briefing</div><span class="badge badge-green">Active</span></div><div class="feed-time">Pass #V-003 · Conf B · Valid until 15:00</div></div></div>
+                <div class="feed-item"><div class="feed-dot" style="background:#16a34a"></div><div style="flex:1"><div style="display:flex;justify-content:space-between"><div class="feed-text"><strong>Linda Wilson</strong> — Document Delivery</div><span class="badge badge-green">Active</span></div><div class="feed-time">Pass #V-004 · Lobby · Valid until 14:00</div></div></div>
+                <div class="feed-item"><div class="feed-dot" style="background:#16a34a"></div><div style="flex:1"><div style="display:flex;justify-content:space-between"><div class="feed-text"><strong>Eric Banda</strong> — IT Maintenance</div><span class="badge badge-green">Active</span></div><div class="feed-time">Pass #V-005 · Floor 2 · Valid until 17:00</div></div></div>
+              </div>
+              <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);text-align:center;color:var(--text3);font-size:12px" id="visitor-count-label">5 active passes today</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIVE ID SCANS -->
+        <div id="p-scans">
+          <div class="grid-3 section-gap">
+            <div class="metric-card"><div class="metric-accent" style="background:#16a34a"></div><div class="metric-icon">✅</div><div class="metric-val" id="s-granted">87</div><div class="metric-label">Granted Scans Today</div></div>
+            <div class="metric-card"><div class="metric-accent" style="background:#dc2626"></div><div class="metric-icon">⛔</div><div class="metric-val" id="s-denied">7</div><div class="metric-label">Denied Scans Today</div></div>
+            <div class="metric-card"><div class="metric-accent" style="background:#d97706"></div><div class="metric-icon">📡</div><div class="metric-val" id="s-rate">2.3/min</div><div class="metric-label">Current Scan Rate</div></div>
+          </div>
+          <div class="card section-gap">
+            <div class="card-header"><div class="card-title"><span class="live-dot"></span> &nbsp;Live ID Scan Stream</div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-gold btn-sm" onclick="simulateScan()">⚡ Simulate Scan</button>
+                <button class="btn btn-ghost btn-sm" onclick="toggleLiveStream()" id="stream-btn">⏸ Pause Live</button>
+              </div>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>Time</th><th>Employee</th><th>Card ID</th><th>Gate / Reader</th><th>Action</th><th>Result</th></tr></thead>
+              <tbody id="scans-tbody"></tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <!-- USERS -->
+        <div id="p-users">
+          <div class="toolbar">
+            <div class="search-wrap"><span>🔍</span><input type="text" placeholder="Search system users..."></div>
+            <button class="btn btn-gold btn-sm" onclick="showAddUser()" style="margin-left:auto">+ Add User</button>
+          </div>
+          <div class="card"><div class="table-wrap"><table><thead><tr><th>User</th><th>Username</th><th>Role</th><th>Last Login</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="users-tbody"></tbody>
+          </table></div></div>
+        </div>
+
+        <!-- AUDIT LOG -->
+        <div id="p-audit">
+          <div class="toolbar">
+            <div class="search-wrap"><span>🔍</span><input type="text" id="audit-search" placeholder="Search audit log..." oninput="renderAudit()"></div>
+            <button class="filter-btn active" onclick="auditFilter('all',this)">All</button>
+            <button class="filter-btn" onclick="auditFilter('auth',this)">Auth</button>
+            <button class="filter-btn" onclick="auditFilter('admin',this)">Admin</button>
+            <button class="filter-btn" onclick="auditFilter('security',this)">Security</button>
+            <button class="btn btn-ghost btn-sm" style="margin-left:auto">Export</button>
+          </div>
+          <div class="card"><div class="table-wrap"><table><thead><tr><th>Timestamp</th><th>Actor</th><th>Action</th><th>Target</th><th>Source</th><th>Result</th></tr></thead>
+            <tbody id="audit-tbody"></tbody>
+          </table></div></div>
+        </div>
+
+        <!-- REPORTS -->
+        <div id="p-reports">
+          <div class="metrics">
+            <div class="metric-card"><div class="metric-icon">📈</div><div class="metric-val">94.2%</div><div class="metric-label">Avg Attendance (Apr)</div></div>
+            <div class="metric-card"><div class="metric-icon">⏰</div><div class="metric-val">7.8h</div><div class="metric-label">Avg Work Hours</div></div>
+            <div class="metric-card"><div class="metric-icon">🔒</div><div class="metric-val">12</div><div class="metric-label">Security Incidents (Apr)</div></div>
+            <div class="metric-card"><div class="metric-icon">🪪</div><div class="metric-val">48</div><div class="metric-label">Visitor Passes (Apr)</div></div>
+          </div>
+
+          <div class="card section-gap">
+            <div class="card-header"><div class="card-title">📅 Daily Overview Report</div></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+              <div style="flex:1;min-width:200px"><label class="form-label">Select Date</label><input type="date" class="form-input" id="report-date"></div>
+              <button class="btn btn-gold" onclick="generateDailyReport()">Generate Overview</button>
+              <button class="btn btn-ghost" onclick="exportDailyReport()">📥 Export PDF</button>
+            </div>
+            <div id="daily-report-output" style="display:none;border-top:1px solid var(--border);padding-top:16px"></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Monthly Attendance Trend</div></div>
+              <div class="att-chart" style="height:100px">
+                <div class="att-bar-wrap"><div class="att-bar" style="height:90%;background:#2563eb"></div><div class="att-label">Jan</div></div>
+                <div class="att-bar-wrap"><div class="att-bar" style="height:85%;background:#2563eb"></div><div class="att-label">Feb</div></div>
+                <div class="att-bar-wrap"><div class="att-bar" style="height:88%;background:#2563eb"></div><div class="att-label">Mar</div></div>
+                <div class="att-bar-wrap"><div class="att-bar" style="height:94%;background:#16a34a"></div><div class="att-label">Apr</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Access Denials by Location</div></div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;font-size:13px">
+                <div style="display:flex;align-items:center;gap:10px"><div style="flex:1">Floor 4 — Pres. Suite</div><div class="progress-bar" style="width:140px"><div class="progress-fill" style="width:70%;background:#dc2626"></div></div><span style="font-family:var(--mono);min-width:24px">7</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><div style="flex:1">Server Room</div><div class="progress-bar" style="width:140px"><div class="progress-fill" style="width:30%;background:#d97706"></div></div><span style="font-family:var(--mono);min-width:24px">3</span></div>
+                <div style="display:flex;align-items:center;gap:10px"><div style="flex:1">Floor 3 — Cabinet</div><div class="progress-bar" style="width:140px"><div class="progress-fill" style="width:20%;background:#d97706"></div></div><span style="font-family:var(--mono);min-width:24px">2</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Other Reports</div></div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <button class="btn btn-ghost" onclick="alert('Generating Monthly Attendance Report...')">📄 Monthly Attendance</button>
+              <button class="btn btn-ghost" onclick="alert('Generating Access Log Export...')">🔑 Access Log Export</button>
+              <button class="btn btn-ghost" onclick="alert('Generating Security Incident Report...')">🚨 Security Incidents</button>
+              <button class="btn btn-ghost" onclick="alert('Generating Workforce Summary...')">👥 Workforce Summary</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="p-settings">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header"><div class="card-title">Organisation Profile</div></div>
+              <div class="form-row"><label class="form-label">Institution Name</label><input class="form-input" value="Ministry of State for Presidential Affairs"></div>
+              <div class="form-row"><label class="form-label">Site Location</label><input class="form-input" value="Executive Mansion, Monrovia, Liberia"></div>
+              <div class="form-row"><label class="form-label">Working Hours</label>
+                <div style="display:flex;gap:10px"><input class="form-input" type="time" value="08:00"><input class="form-input" type="time" value="17:00"></div>
+              </div>
+              <div class="form-row"><label class="form-label">Late Grace Period (minutes)</label><input class="form-input" type="number" value="15"></div>
+              <button class="btn btn-gold">Save Changes</button>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-title">Security & Notifications</div></div>
+              <div class="form-row"><label class="form-label">Failed Login Lockout</label>
+                <select class="form-select"><option>After 3 attempts</option><option>After 5 attempts</option><option>Disabled</option></select>
+              </div>
+              <div class="form-row"><label class="form-label">Two-Factor Authentication</label>
+                <select class="form-select"><option>Required for Admins</option><option>Required for All</option><option>Optional</option></select>
+              </div>
+              <div class="form-row"><label class="form-label">Email Alerts</label>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+                  <label><input type="checkbox" checked> Unauthorized access attempts</label>
+                  <label><input type="checkbox" checked> Daily attendance summary</label>
+                  <label><input type="checkbox"> Visitor pass expiry warnings</label>
+                  <label><input type="checkbox" checked> System errors</label>
+                </div>
+              </div>
+              <div class="form-row"><label class="form-label">Session Timeout (minutes)</label><input class="form-input" type="number" value="30"></div>
+              <button class="btn btn-gold">Save Changes</button>
+            </div>
+          </div>
+          <div class="card section-gap" style="margin-top:16px">
+            <div class="card-header"><div class="card-title">System Information</div></div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;font-size:13px">
+              <div><span style="color:var(--text3)">Platform Version:</span> <strong>CIS v1.1.0</strong></div>
+              <div><span style="color:var(--text3)">Database:</span> <strong>Online · Synced</strong></div>
+              <div><span style="color:var(--text3)">Card Readers:</span> <strong>14 / 14 online</strong></div>
+              <div><span style="color:var(--text3)">Last Backup:</span> <strong>Today 03:00 AM</strong></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Employee Modal -->
+<div class="modal-overlay" id="add-emp-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Register New Employee</div><button class="modal-close" onclick="closeModal('add-emp-modal')">×</button></div>
+    <div class="form-row"><label class="form-label">Full Name</label><input class="form-input" id="new-emp-name" placeholder="Full legal name"></div>
+    <div class="form-row"><label class="form-label">Department</label><select class="form-select" id="new-emp-dept"><option>Office of the President</option><option>Cabinet Secretariat</option><option>State Protocol & Diplomacy</option><option>Security & Liaison</option><option>Finance & Administration</option></select></div>
+    <div class="form-row"><label class="form-label">Job Title</label><input class="form-input" id="new-emp-title" placeholder="e.g. Senior Analyst"></div>
+    <div class="form-row"><label class="form-label">Access Level</label><select class="form-select" id="new-emp-level"><option value="1">Level 1 — General Staff</option><option value="2">Level 2 — Senior Staff</option><option value="3">Level 3 — Director</option><option value="4">Level 4 — Cabinet</option><option value="5">Level 5 — Presidential</option></select></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('add-emp-modal')">Cancel</button><button class="btn btn-gold" onclick="addEmployee()">Register & Issue Card</button></div>
+  </div>
+</div>
+
+<!-- Floor Modal -->
+<div class="modal-overlay" id="floor-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="floor-modal-title">Room Detail</div><button class="modal-close" onclick="closeModal('floor-modal')">×</button></div>
+    <div id="floor-modal-body"></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('floor-modal')">Close</button><button class="btn btn-danger btn-sm" onclick="alert('Room lockdown initiated! Security has been notified.');closeModal('floor-modal')">🔒 Emergency Lockdown</button></div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal-overlay" id="add-user-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add System User</div><button class="modal-close" onclick="closeModal('add-user-modal')">×</button></div>
+    <div class="form-row"><label class="form-label">Full Name</label><input class="form-input" id="new-user-name" placeholder="Full name"></div>
+    <div class="form-row"><label class="form-label">Username</label><input class="form-input" id="new-user-username" placeholder="username"></div>
+    <div class="form-row"><label class="form-label">Role</label><select class="form-select" id="new-user-role"><option>System Administrator</option><option>Security Officer</option><option>HR Manager</option><option>Reception / Front Desk</option><option>Read-Only Auditor</option></select></div>
+    <div class="form-row"><label class="form-label">Temporary Password</label><input class="form-input" type="text" value="Mansion@2026"></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('add-user-modal')">Cancel</button><button class="btn btn-gold" onclick="addUser()">Create User</button></div>
+  </div>
+</div>
+
+<!-- Scan Toast -->
+<div class="scan-toast" id="scan-toast">
+  <div class="scan-toast-icon" id="toast-icon">✅</div>
+  <div><div class="scan-toast-text" id="toast-text">ID Scanned</div><div class="scan-toast-sub" id="toast-sub"></div></div>
+</div>
+
+<script>
+  // ====== Date ======
+  const d = new Date();
+  document.getElementById('today-date').textContent = d.toLocaleDateString('en-US',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+  document.getElementById('att-date-title').textContent = "Today's Check-in Log — " + d.toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('report-date').valueAsDate = new Date();
+
+  // ====== Login / Logout ======
+  function doLogin() {
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    pushAudit('sysadmin','Login','Web console','127.0.0.1','success','auth');
+  }
+  function doLogout() {
+    if(!confirm('Sign out of the system?')) return;
+    pushAudit('sysadmin','Logout','Web console','127.0.0.1','success','auth');
+    document.getElementById('app').style.display='none';
+    document.getElementById('login-screen').style.display='flex';
+  }
+
+  // ====== Employees ======
+  const employees = [
+    {id:'EMP-0041',name:'Johnson Brownell',initials:'JB',dept:'Cabinet Secretariat',role:'Director',card:'KC-2241',level:4,status:'active',color:'#dbeafe',tc:'#1e40af'},
+    {id:'EMP-0028',name:'Oretha Kollie',initials:'OK',dept:'Admin Office',role:'Senior Officer',card:'KC-2228',level:2,status:'active',color:'#dcfce7',tc:'#166534'},
+    {id:'EMP-0007',name:'Abraham Morris',initials:'AM',dept:'Finance & Admin',role:'Accountant',card:'KC-2207',level:1,status:'active',color:'#fef3c7',tc:'#92400e'},
+    {id:'EMP-0063',name:'Florence Togba',initials:'FT',dept:'State Protocol',role:'Protocol Officer',card:'KC-2263',level:2,status:'leave',color:'#fee2e2',tc:'#991b1b'},
+    {id:'EMP-0015',name:'George Tarpeh',initials:'GT',dept:'Pres. Office',role:'Chief of Staff',card:'KC-2215',level:5,status:'active',color:'#f3e8ff',tc:'#6b21a8'},
+    {id:'EMP-0091',name:'Martha Musa',initials:'MM',dept:'Finance & Admin',role:'Budget Officer',card:'KC-2291',level:2,status:'active',color:'#dcfce7',tc:'#166534'},
+    {id:'EMP-0049',name:'Roland Weah',initials:'RW',dept:'Security & Liaison',role:'Security Chief',card:'KC-2249',level:4,status:'leave',color:'#dbeafe',tc:'#1e40af'},
+  ];
+
+  function renderEmployees(data) {
+    const lvlColors = {1:'badge-gray',2:'badge-blue',3:'badge-yellow',4:'badge-red',5:'badge-red'};
+    document.getElementById('emp-tbody').innerHTML = data.map(e => {
+      const dots = [1,2,3,4,5].map(i=>`<div class="access-dot" style="background:${i<=e.level?'#2563eb':'var(--surface3)'}"></div>`).join('');
+      return `<tr>
+        <td><div class="emp-info"><div class="emp-avatar" style="background:${e.color};color:${e.tc}">${e.initials}</div><div><div class="emp-name">${e.name}</div><div class="emp-id">${e.id}</div></div></div></td>
+        <td>${e.dept}</td><td><span class="role-tag">${e.role}</span></td>
+        <td style="font-family:var(--mono);font-size:12px">${e.card}</td>
+        <td><div style="display:flex;align-items:center;gap:8px"><div class="access-bar">${dots}</div><span class="badge ${lvlColors[e.level]}">L${e.level}</span></div></td>
+        <td><span class="badge ${e.status==='active'?'badge-green':'badge-blue'}">${e.status==='active'?'● Active':'On Leave'}</span></td>
+        <td><button class="btn btn-ghost btn-sm" onclick="alert('Smart card details for ${e.name}:\\nCard: ${e.card}\\nLevel: L${e.level}')">Card</button></td>
+      </tr>`;
+    }).join('');
+  }
+  renderEmployees(employees);
+
+  function filterEmployees() {
+    const q = document.getElementById('emp-search').value.toLowerCase();
+    renderEmployees(employees.filter(e=>e.name.toLowerCase().includes(q)||e.dept.toLowerCase().includes(q)||e.id.toLowerCase().includes(q)));
+  }
+  function empFilter(type, btn) {
+    document.querySelectorAll('#p-employees .filter-btn').forEach(b=>b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    const q = document.getElementById('emp-search').value.toLowerCase();
+    renderEmployees(employees.filter(e=>{
+      const mq = !q||e.name.toLowerCase().includes(q)||e.dept.toLowerCase().includes(q);
+      const mf = type==='all'||(type==='active'&&e.status==='active')||(type==='leave'&&e.status==='leave');
+      return mq&&mf;
+    }));
+  }
+
+  // ====== Navigation ======
+  function navigate(page, el) {
+    document.querySelectorAll('.pages > div').forEach(p=>p.classList.remove('active'));
+    document.getElementById('p-'+page).classList.add('active');
+    document.querySelectorAll('.sidebar .nav-item').forEach(n=>n.classList.remove('active'));
+    if(el) el.classList.add('active');
+    else {
+      const link = Array.from(document.querySelectorAll('.sidebar .nav-item')).find(n=>n.getAttribute('onclick')&&n.getAttribute('onclick').includes(`'${page}'`));
+      if(link) link.classList.add('active');
+    }
+    const titles = {dashboard:'System Dashboard',employees:'Employee Directory',attendance:'Attendance Tracking',access:'Access Control',visitors:'Guest & Visitor Management',scans:'Live ID Scans',users:'System Users',audit:'Audit Log',reports:'Reports & Analytics',settings:'System Settings'};
+    document.getElementById('page-title').textContent = titles[page]||page;
+  }
+
+  function showAddEmp() { document.getElementById('add-emp-modal').classList.add('show'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+  function addEmployee() {
+    const name = document.getElementById('new-emp-name').value.trim();
+    if(!name){alert('Please enter the employee name.');return;}
+    const dept = document.getElementById('new-emp-dept').value;
+    const title = document.getElementById('new-emp-title').value||'Staff';
+    const level = parseInt(document.getElementById('new-emp-level').value);
+    const id = 'EMP-0'+String(Math.floor(Math.random()*900)+100);
+    const card = 'KC-'+String(Math.floor(Math.random()*9000)+1000);
+    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const colors = ['#dbeafe','#dcfce7','#fef3c7','#f3e8ff','#fee2e2'];
+    const tcs = ['#1e40af','#166534','#92400e','#6b21a8','#991b1b'];
+    const ci = Math.floor(Math.random()*5);
+    employees.push({id,name,initials,dept,role:title,card,level,status:'active',color:colors[ci],tc:tcs[ci]});
+    renderEmployees(employees);
+    closeModal('add-emp-modal');
+    document.getElementById('new-emp-name').value='';
+    document.getElementById('new-emp-title').value='';
+    pushAudit('sysadmin','Create Employee',name+' ('+id+')','Web','success','admin');
+    alert('Employee registered successfully!\n\nID: '+id+'\nSmart Card Issued: '+card+'\nAccess Level: L'+level);
+  }
+
+  function showFloorDetail(room,access,count,status) {
+    document.getElementById('floor-modal-title').textContent = room;
+    document.getElementById('floor-modal-body').innerHTML = `
+      <div style="margin-bottom:12px"><span class="badge ${status==='open'?'badge-green':'badge-red'}">${status==='open'?'🔓 Currently Unlocked':'🔒 Restricted Access'}</span></div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:8px">Authorised access: <strong>${access}</strong></p>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Occupants currently inside: <strong>${count} people</strong></p>
+      <div class="alert alert-info"><span>ℹ️</span><span>Use Emergency Lockdown to immediately revoke all active access and alert the Security team.</span></div>`;
+    document.getElementById('floor-modal').classList.add('show');
+  }
+
+  // ====== Visitors ======
+  let visitorCount = 5;
+  let visitorsToday = 14;
+  let activeVisitors = 5;
+  function issueVisitorPass() {
+    const name = document.getElementById('vis-name').value.trim();
+    if(!name){alert('Please enter the visitor name.');return;}
+    const purpose = document.getElementById('vis-purpose').value||'General Visit';
+    const area = document.getElementById('vis-area').value;
+    const until = document.getElementById('vis-until').value;
+    visitorCount++; visitorsToday++; activeVisitors++;
+    const passNum = 'V-00'+visitorCount;
+    const div = document.createElement('div');
+    div.className='feed-item';
+    div.innerHTML=`<div class="feed-dot" style="background:#16a34a"></div>
+      <div style="flex:1"><div style="display:flex;justify-content:space-between">
+        <div class="feed-text"><strong>${name}</strong> — ${purpose}</div>
+        <span class="badge badge-green">Active</span></div>
+        <div class="feed-time">Pass #${passNum} · ${area} · Valid until ${until}</div>
+      </div>`;
+    document.getElementById('visitor-list').appendChild(div);
+    document.getElementById('visitor-count-label').textContent = activeVisitors + ' active passes today';
+    document.getElementById('v-today').textContent = visitorsToday;
+    document.getElementById('v-active').textContent = activeVisitors;
+    document.getElementById('m-vis-today').textContent = visitorsToday;
+    document.getElementById('m-vis-active').textContent = activeVisitors;
+    document.getElementById('vis-name').value='';
+    document.getElementById('vis-purpose').value='';
+    pushAudit('sysadmin','Issue Visitor Pass',name+' ('+passNum+')','Web','success','admin');
+    alert('Visitor pass issued!\n\nPass: #'+passNum+'\nName: '+name+'\nArea: '+area+'\nValid until: '+until);
+  }
+
+  // ====== Live ID Scans ======
+  const gates = ['Main Gate','Side Entrance','VIP Gate','Floor 2 Reader','Floor 3 Reader','Conference A Reader'];
+  let scans = [
+    {time:'09:12 AM',name:'Unknown',card:'UNK-441',gate:'Floor 4 Reader',action:'Scan',result:'denied'},
+    {time:'09:08 AM',name:'George Tarpeh',card:'KC-2215',gate:'Floor 3 Reader',action:'Entry',result:'granted'},
+    {time:'09:02 AM',name:'James Kollie (Visitor)',card:'V-001',gate:'Conference A Reader',action:'Entry',result:'visitor'},
+    {time:'08:55 AM',name:'Oretha Kollie',card:'KC-2228',gate:'Floor 2 Reader',action:'Entry',result:'granted'},
+    {time:'08:47 AM',name:'Johnson Brownell',card:'KC-2241',gate:'Floor 3 Reader',action:'Entry',result:'granted'},
+    {time:'08:32 AM',name:'Abraham Morris',card:'KC-2207',gate:'Main Gate',action:'Check-in',result:'granted'},
+    {time:'08:05 AM',name:'Oretha Kollie',card:'KC-2228',gate:'Side Entrance',action:'Check-in',result:'granted'},
+    {time:'07:52 AM',name:'Johnson Brownell',card:'KC-2241',gate:'Main Gate',action:'Check-in',result:'granted'},
+    {time:'07:45 AM',name:'Martha Musa',card:'KC-2291',gate:'Main Gate',action:'Check-in',result:'granted'},
+  ];
+  let grantedCount = 87, deniedCount = 7;
+
+  function badgeForResult(r){
+    if(r==='granted') return '<span class="badge badge-green">✓ Granted</span>';
+    if(r==='denied') return '<span class="badge badge-red">✗ Denied</span>';
+    return '<span class="badge badge-yellow">Visitor</span>';
+  }
+  function renderScans() {
+    document.getElementById('scans-tbody').innerHTML = scans.map(s=>`
+      <tr>
+        <td style="font-family:var(--mono);font-size:12px">${s.time}</td>
+        <td>${s.name}</td>
+        <td style="font-family:var(--mono);font-size:12px">${s.card}</td>
+        <td>${s.gate}</td>
+        <td>${s.action}</td>
+        <td>${badgeForResult(s.result)}</td>
+      </tr>`).join('');
+    // dashboard mini feed (latest 4)
+    document.getElementById('dash-scan-feed').innerHTML = scans.slice(0,4).map(s=>{
+      const color = s.result==='granted'?'#16a34a':s.result==='denied'?'#dc2626':'#d97706';
+      return `<div class="feed-item"><div class="feed-dot" style="background:${color}"></div>
+        <div><div class="feed-text">${s.result==='denied'?'<strong>Denied:</strong> ':''}${s.name} — ${s.gate}</div>
+        <div class="feed-time">${s.time} · Card ${s.card}</div></div></div>`;
+    }).join('');
+    document.getElementById('s-granted').textContent = grantedCount;
+    document.getElementById('s-denied').textContent = deniedCount;
+    document.getElementById('m-scans').textContent = grantedCount + deniedCount;
+  }
+  renderScans();
+
+  function showScanToast(scan){
+    const t = document.getElementById('scan-toast');
+    const denied = scan.result==='denied';
+    t.classList.toggle('denied', denied);
+    document.getElementById('toast-icon').textContent = denied?'⛔':scan.result==='visitor'?'🪪':'✅';
+    document.getElementById('toast-text').innerHTML = `<strong>${scan.name}</strong> — ${denied?'Access Denied':'Scan accepted'}`;
+    document.getElementById('toast-sub').textContent = `${scan.gate} · ${scan.card} · ${scan.time}`;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 3500);
+  }
+
+  function nowTime(){
+    const n = new Date();
+    let h = n.getHours(), m = n.getMinutes();
+    const ap = h>=12?'PM':'AM'; h = h%12||12;
+    return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+' '+ap;
+  }
+
+  function simulateScan() {
+    const e = employees[Math.floor(Math.random()*employees.length)];
+    const gate = gates[Math.floor(Math.random()*gates.length)];
+    const denied = Math.random()<0.12;
+    const scan = {time:nowTime(),name:denied?'Unknown':e.name,card:denied?'UNK-'+Math.floor(Math.random()*900):e.card,gate,action:'Scan',result:denied?'denied':'granted'};
+    scans.unshift(scan);
+    if(scans.length>40) scans.pop();
+    if(denied) deniedCount++; else grantedCount++;
+    renderScans();
+    showScanToast(scan);
+    pushAudit('reader-'+gate.replace(/\s+/g,'').toLowerCase(),'Card Scan',scan.name+' ('+scan.card+')',gate,denied?'denied':'success','security');
+  }
+
+  // Auto-stream new scans
+  let streamOn = true;
+  let streamTimer = null;
+  function startStream(){ streamTimer = setInterval(()=>{ if(streamOn) simulateScan(); }, 9000); }
+  function toggleLiveStream(){
+    streamOn = !streamOn;
+    document.getElementById('stream-btn').textContent = streamOn?'⏸ Pause Live':'▶ Resume Live';
+  }
+  startStream();
+
+  // ====== Users ======
+  const users = [
+    {name:'System Admin',initials:'SA',username:'sysadmin',role:'System Administrator',last:'Just now',status:'active',color:'#fef3c7',tc:'#92400e'},
+    {name:'Roland Weah',initials:'RW',username:'rweah',role:'Security Officer',last:'Today 08:12 AM',status:'active',color:'#dbeafe',tc:'#1e40af'},
+    {name:'Patricia Davis',initials:'PD',username:'pdavis',role:'HR Manager',last:'Yesterday 16:40',status:'active',color:'#dcfce7',tc:'#166534'},
+    {name:'Front Desk',initials:'FD',username:'reception',role:'Reception / Front Desk',last:'Today 07:30 AM',status:'active',color:'#f3e8ff',tc:'#6b21a8'},
+    {name:'Mary Karpeh',initials:'MK',username:'mkarpeh',role:'Read-Only Auditor',last:'3 days ago',status:'inactive',color:'#fee2e2',tc:'#991b1b'},
+  ];
+  function renderUsers(){
+    document.getElementById('users-tbody').innerHTML = users.map(u=>`
+      <tr>
+        <td><div class="emp-info"><div class="emp-avatar" style="background:${u.color};color:${u.tc}">${u.initials}</div><div><div class="emp-name">${u.name}</div></div></div></td>
+        <td style="font-family:var(--mono);font-size:12px">${u.username}</td>
+        <td><span class="role-tag">${u.role}</span></td>
+        <td style="font-size:12px;color:var(--text2)">${u.last}</td>
+        <td><span class="badge ${u.status==='active'?'badge-green':'badge-gray'}">${u.status==='active'?'● Active':'Inactive'}</span></td>
+        <td><button class="btn btn-ghost btn-sm" onclick="alert('Edit user: ${u.username}')">Edit</button></td>
+      </tr>`).join('');
+  }
+  renderUsers();
+  function showAddUser(){ document.getElementById('add-user-modal').classList.add('show'); }
+  function addUser(){
+    const name = document.getElementById('new-user-name').value.trim();
+    const username = document.getElementById('new-user-username').value.trim();
+    if(!name||!username){alert('Please complete all required fields.');return;}
+    const role = document.getElementById('new-user-role').value;
+    const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    users.push({name,initials,username,role,last:'Never',status:'active',color:'#dbeafe',tc:'#1e40af'});
+    renderUsers();
+    closeModal('add-user-modal');
+    document.getElementById('new-user-name').value='';
+    document.getElementById('new-user-username').value='';
+    pushAudit('sysadmin','Create User',name+' ('+username+')','Web','success','admin');
+    alert('System user created!\n\nUsername: '+username+'\nRole: '+role);
+  }
+
+  // ====== Audit Log ======
+  const audit = [
+    {ts:'2026-04-30 09:12:14',actor:'reader-floor4reader',action:'Card Scan',target:'Unknown (UNK-441)',source:'Floor 4 Reader',result:'denied',cat:'security'},
+    {ts:'2026-04-30 09:08:02',actor:'reader-floor3reader',action:'Card Scan',target:'George Tarpeh (KC-2215)',source:'Floor 3 Reader',result:'success',cat:'security'},
+    {ts:'2026-04-30 08:30:11',actor:'reception',action:'Issue Visitor Pass',target:'James Kollie (V-001)',source:'Web',result:'success',cat:'admin'},
+    {ts:'2026-04-30 08:05:44',actor:'sysadmin',action:'Login',target:'Web console',source:'127.0.0.1',result:'success',cat:'auth'},
+    {ts:'2026-04-29 17:42:08',actor:'pdavis',action:'Update Employee',target:'Florence Togba (EMP-0063)',source:'Web',result:'success',cat:'admin'},
+    {ts:'2026-04-29 14:20:55',actor:'rweah',action:'Lock Floor 4',target:'Floor 4 — Pres. Suite',source:'Web',result:'success',cat:'security'},
+    {ts:'2026-04-29 09:01:33',actor:'unknown',action:'Failed Login',target:'sysadmin',source:'192.168.1.45',result:'failed',cat:'auth'},
+  ];
+  let auditFilterCat = 'all';
+  function pushAudit(actor,action,target,source,result,cat){
+    const n = new Date();
+    const ts = n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+    audit.unshift({ts,actor,action,target,source,result,cat});
+    if(audit.length>200) audit.pop();
+    renderAudit();
+  }
+  function renderAudit(){
+    const q = (document.getElementById('audit-search')?.value||'').toLowerCase();
+    const rows = audit.filter(a=>(auditFilterCat==='all'||a.cat===auditFilterCat) && (!q||JSON.stringify(a).toLowerCase().includes(q)));
+    document.getElementById('audit-tbody').innerHTML = rows.map(a=>{
+      const b = a.result==='success'?'badge-green':a.result==='denied'||a.result==='failed'?'badge-red':'badge-yellow';
+      return `<tr>
+        <td style="font-family:var(--mono);font-size:12px">${a.ts}</td>
+        <td>${a.actor}</td>
+        <td>${a.action}</td>
+        <td>${a.target}</td>
+        <td style="font-size:12px;color:var(--text2)">${a.source}</td>
+        <td><span class="badge ${b}">${a.result}</span></td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:24px">No matching events</td></tr>';
+  }
+  function auditFilter(cat,btn){
+    auditFilterCat = cat;
+    document.querySelectorAll('#p-audit .filter-btn').forEach(b=>b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    renderAudit();
+  }
+  renderAudit();
+
+  // ====== Daily Report ======
+  function generateDailyReport(){
+    const dateStr = document.getElementById('report-date').value;
+    if(!dateStr){alert('Please select a date.');return;}
+    const dt = new Date(dateStr);
+    const dayName = dt.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+    // Deterministic pseudo-stats per date
+    const seed = dt.getDate() + dt.getMonth()*31;
+    const present = 100 + (seed*7)%40;
+    const absent = 5 + (seed*3)%18;
+    const late = 2 + (seed*5)%12;
+    const visitors = 5 + (seed*2)%25;
+    const scans = 60 + (seed*11)%80;
+    const denied = (seed%5);
+    const total = present + absent;
+    const pct = ((present/total)*100).toFixed(1);
+
+    const out = document.getElementById('daily-report-output');
+    out.style.display = 'block';
+    out.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div><div style="font-size:16px;font-weight:700">${dayName}</div><div style="font-size:12px;color:var(--text3)">Daily Operations Overview · Executive Mansion</div></div>
+        <span class="badge badge-blue">Report #${dt.getTime().toString().slice(-6)}</span>
+      </div>
+      <div class="grid-3" style="margin-bottom:12px">
+        <div class="metric-card"><div class="metric-icon">✅</div><div class="metric-val">${present}</div><div class="metric-label">Present</div><div class="metric-delta">${pct}% attendance</div></div>
+        <div class="metric-card"><div class="metric-icon">❌</div><div class="metric-val">${absent}</div><div class="metric-label">Absent</div></div>
+        <div class="metric-card"><div class="metric-icon">⏰</div><div class="metric-val">${late}</div><div class="metric-label">Late Arrivals</div></div>
+      </div>
+      <div class="grid-3" style="margin-bottom:14px">
+        <div class="metric-card"><div class="metric-icon">🪪</div><div class="metric-val">${visitors}</div><div class="metric-label">Visitors</div></div>
+        <div class="metric-card"><div class="metric-icon">📡</div><div class="metric-val">${scans}</div><div class="metric-label">ID Scans</div></div>
+        <div class="metric-card"><div class="metric-icon">⛔</div><div class="metric-val">${denied}</div><div class="metric-label">Denied Attempts</div></div>
+      </div>
+      <div style="background:var(--surface2);border-radius:var(--radius);padding:14px 16px;font-size:13px;line-height:1.55">
+        <strong>Summary:</strong> On ${dayName}, the Executive Mansion recorded <strong>${present}</strong> present staff (<strong>${pct}%</strong>),
+        with <strong>${late}</strong> late arrivals and <strong>${absent}</strong> absences. A total of <strong>${scans}</strong> ID card scans were processed across all gates,
+        of which <strong>${denied}</strong> were denied. <strong>${visitors}</strong> visitors were registered and granted temporary passes.
+        ${denied>2?'<br><br>⚠️ Denial count above normal threshold — security review recommended.':''}
+      </div>
+      <div style="margin-top:14px;font-size:11px;color:var(--text3)">Generated ${new Date().toLocaleString()} · Ministry of State, Liberia</div>
+    `;
+  }
+  function exportDailyReport(){
+    if(document.getElementById('daily-report-output').style.display==='none'){alert('Please generate the report first.');return;}
+    alert('Daily report exported as PDF and saved to system records.');
+  }
+</script>
+</body>
+</html>
